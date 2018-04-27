@@ -9,6 +9,7 @@
 \usepackage{listings}
 \lstset{frame=single,framerule=0pt,language={C},showstringspaces=false,numbers=left,columns=fullflexible}
 
+
 % COMP2111-specific macros. See
 % http://www.cse.unsw.edu.au/~cs2111/18s1/LaTeX/primer.html
 \usepackage{2111defs2}
@@ -37,71 +38,109 @@ Anqi ZHU(z5141541)
 \begin{document}
 \maketitle
 \section{Task 1}
-main function (sth here) \
+\subsection{Prime }
+A number is a prime is a nautal number greater than 1 that 
+cannot be formed by mutiplying two smaller number\footnote{
+Direct reference from Wikipedia:
+\url{https://en.wikipedia.org/wiki/Prime_number}}.
+Hence we can have the definition by set theory:
 \begin{gather*}
-  \PROC \ EMIRP(\VALUE \ n:\nat, \RESULT \ r:\nat)\cdot\cdotp\\
-  \nt{
-    n,r:\left[\begin{array}[c]{l}
-      n >0, \\
-      \sum_{i = 1}^{r}emirp(i)= n \And \sum_{i = 1}^{r-1}emirp(i)= n-1
-    \end{array}\right]
-  }{(1)}
+  Prime = \{ n | \neg \Exi{x\in (2..n-1)}{x|n} \}
+\end{gather*} 
+
+\subsection{Reverse}
+To define a emirp, a mathmatical function to decribe a number's reverse
+would be helpful. 
+By the spec in verifying reversen\footnote{A 
+proof provided by Lecturer in Control of this course on 
+\url{https://www.cse.unsw.edu.au/~cs2111/18s1/lec/reverse.pdf} },
+we have this definition:
+\begin{gather*}
+  rev(n) = \sum_{i= 0}^{c(n)}(S_i 10^i)
 \end{gather*}
-where (sth here)
+where:
 \begin{gather*}
-  emirpVal(i) =
-  \begin{cases}
-    1 & \text{if } isPrime(r) \And isPrime(reverse(r)) \And r \neq reverse(r)\\
-    0 & \text{else }
+  c(n) = \lfloor log_{10}(n)\rfloor ,\\
+  S = [10]^* ,\\
+  n \in \nat \And n = \sum_{i=0}^{c(n)}(S_i 10 ^{(c(n)-i)})
+\end{gather*}
+Hence, we can justify the spec of 
+$\PROC \ reversen(\VALUE \ n: \ints, \RESULT \ r: \ints )$ 
+as 
+\begin{gather*}
+  r:[\True, r = rev(n)]
+\end{gather*}
+
+
+\subsection{Emirp}
+An emirp is a prime number that results iin a different prime when its 
+decimal digits are reverse\footnote{
+  Another reference from Wikipedia :\url{https://en.wikipedia.org/wiki/Emirp}
+}. Hence a definition of emirp can be construct as follow:
+\begin{gather*}
+  n \in Emirp \iff n \in Prime \And rev(n) \in Prime 
+\end{gather*}
+We also construct another function to help us find the $n^{th}$ emirp, 
+which is as follow:
+\begin{gather*}
+  isEmirp(n)= \begin{cases}
+    0 & \text{if } n \in Prime \And rev(n) \in Prime \\
+    1 & \text{else }
   \end{cases}
 \end{gather*}
+\subsubsection{Procedure Call}
+Also for our usage in the procedure call in the main programme, 
+we have develop a procedure to do the same thing. Hence we have this spec
+\begin{gather*}
+  \PROC \ ISEMIRP(\VALUE \ n: \nat, \RESULT \ w)\cdot \\
+  \nt{
+  n,w:
+  [
+    \True, 
+    \left(
+      \begin{array}{l}
+        (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
+        (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+      \end{array}
+    \right)
+  ]}{(A)}
+\end{gather*}
+
+\subsubsection{Refinement Calculatiion}
+\begin{align*}
+  \lrefstep{(A)}{\textbf{c-frame}}{
+    w:
+    [
+      \True , 
+      \left(
+        \begin{array}{l}
+          (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
+          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+        \end{array}
+      \right)
+    ]
+  }
+\end{align*}
+
+\subsubsection{Toy Language Code}
+
+
+\subsection{Pre- and Postcondition}
+Our task is find the $n^{th}$ emprip, by the previous definition of $isEmirp(n)$
+we can construct the pre- and postcondition in this way:
+\begin{gather*}
+  \PROC EMIRP(\VALUE \ n: \nat, \RESULT \ r) \\
+  \nt{n: \nat ,  \RESULT \ r: \nat 
+  [
+    \True ,  
+    \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+  ]}{(1)}
+\end{gather*}  
+
 \section{Task 2}
-\begin{align*}
-  % refine to emirp (r) = 1
-  \lrefstep{(1)}
-  {\textbf{c-frame}}
-  {
-    r:\left[\begin{array}[c]{l}
-      n >0, \\
-      \sum_{i = 1}^{r}emirp(i)= n \And \sum_{i = 1}^{r-1}emirp(i)= n-1
-    \end{array}\right]
-  }\\
-  %
-  \refstep{\textbf{i-loc}}
-  {
-    \nt{\VAR j : r,j:\left[\begin{array}[c]{l}
-      n >0 , \\
-      \sum_{i = 1}^{r}emirp(i)= n \And \sum_{i = 1}^{r-1}emirp(i)= n-1
-    \end{array}\right]
-    }{(2)}
-  }\\
-  %
-\end{align*}
-We contruct the loop to verify the prime
-\begin{align*}
-  \lrefstep{(2)}
-  {\textbf{c-frame}}
-  {
-    \nt{\VAR j : r,j:\left[\begin{array}[c]{l}
-      n >0 , \\
-      Inv
-    \end{array}\right]
-    }{(3)};\\
-    &\nt{\VAR j : r,j:\left[\begin{array}[c]{l}
-      Inv, \\
-      \sum_{i = 1}^{r}emirp(i)= n \And \sum_{i = 1}^{r-1}emirp(i)= n-1
-    \end{array}\right]
-    }{(4)};\\
-  }\\
-\end{align*}
-where the loop invariant is defined by
-\begin{align*}
-  Inv =
-  \left(\begin{array}
-    n > 0  \\
-    \sum_{i = 1}^{j}emirp(i)= n \And \sum_{i = 1}^{j-1}emirp(i)= n-1 \And
-  \end{array}\right)
-\end{align*}
+
+
+
 
 
 \end{document}
