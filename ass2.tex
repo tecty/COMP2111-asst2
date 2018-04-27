@@ -280,7 +280,7 @@ we have develop a procedure to do the same thing. Hence we have this spec
 Our task is find the $n^{th}$ emprip, by the previous definition of $isEmirp(n)$
 we can construct the pre- and postcondition in this way:
 \begin{gather*}
-  \PROC EMIRP(\VALUE \ n: \nat, \RESULT \ r) \\
+  \PROC \ EMIRP(\VALUE \ n: \nat, \RESULT \ r) \\
   \nt{n: \nat ,  \RESULT \ r: \nat 
   [
     \True ,  
@@ -289,9 +289,117 @@ we can construct the pre- and postcondition in this way:
 \end{gather*}  
 
 \section{Task 2}
+\begin{align*}
+  \lrefstep{(1)}{\textbf{c-frame}}{
+    r
+    [
+      \True ,  
+      \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+    ]
+  }
+  \\
+  \refstep{\textbf{i-loc}}{
+    count \cdot r
+    [
+      \True ,  
+      \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+    ]
+  }
+  \\
+  \refstep{\textbf{i-loc}}{
+    \nt{
+      count , r
+      [
+        \True ,  
+        Inv
+      ]
+    }{(2)};\\
+    &\nt{
+      count , r
+      [
+        Inv,
+        \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+      ]
+    }{(3)}
+  }
+\end{align*}
+Where the loop invariant is defined by:
+% TODO: Modify Inv 
+\begin{gather*}
+  Inv = 
+  \left( \begin{array}{l}
+    count = \sum_{i=0}^{count}isEmirp(i) \And count \leq n
+  \end{array}\right)
+\end{gather*}
+\begin{align*}
+  \lrefstep{(2)}{Routine work, set up the variable of loop}{
+    r \Ass 1; count \Ass 0;
+  }
+  \\
+  % TODO: Check whether it's correct s-post 
+  \lrefstep{(3)}{\textbf{s-post}}{
+    count , r
+    [
+      Inv,
+      % \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp \And count = n
+      Inv \And count = n
+    ]
+  }
+  \\
+  \refstep {\textbf{while}}{
+    \WHILE ~count \neq n ~ \DO \\ 
+    & \qquad 
+    \nt{
+      count , r
+      [
+        Inv \And count \neq n ,
+        Inv 
+      ]
+    }{4}
+    \\
+    &\OD
+  }
+  \\
+  \lrefstep{(4)}{\textbf{seq2}}{
+    \nt{
+      r
+      [
+        Inv \And count \neq n ,
+        Inv \subst{r+1}{r}
+      ];
+    }{(5)}
+    \\
+    &\nt{
+      count, r
+      [
+        Inv \subst{r+1}{r},
+        Inv  
+      ]
+    }{(6)}
+  }
+  \\
+  % TODO : whether it need to justify
+  \lrefstep{(5)}{\textbf{ass, need to justify?}}{
+    r \Ass r+1;
+  }
+  % TODO: Need to justify
+  \\
+  \lrefstep{(6)}{\textbf{ass, need to justify?}}{
+    count \Ass count + ISEMIRP(r);
+  }
+\end{align*}
+\subsubsection{Toy Language Programme}
+We collect all out toy language code, we have 
+\begin{gather*}
+  r \Ass 1; count \Ass 0;\\
+  \WHILE ~count \neq n ~ \DO \\
+  \qquad r \Ass r+1;\\
+  \qquad count \Ass count + ISEMIRP(r);
+  \OD 
+\end{gather*}
 
 
-
-
+\subsection{Task 3}
+\subsection{Task 4}
 
 \end{document}
