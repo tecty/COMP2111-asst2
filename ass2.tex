@@ -34,6 +34,9 @@ Anqi ZHU(z5141541)
 \newcommand{\be}{\mathsf{b}}
 \newcommand{\length}[1]{\left|#1\right|}
 \newcommand{\noof}[2]{\left\|#1\right\|_{#2}}
+
+\newcommand{\pre}{\mathit{pre}}
+\newcommand{\post}{\mathit{post}}
 \def\L{\mathcal{L}}
 \begin{document}
 \maketitle
@@ -47,6 +50,21 @@ Hence we can have the definition by set theory:
 \begin{gather*}
   Prime = \{ n | \neg \Exi{x\in (2..n-1)}{x|n} \}
 \end{gather*} 
+Then we can base on the GMP function that make up the spec of the 
+procedure call of $\PROC \ ISPRIME(\VALUE \ n, \RESULT \ r)$ 
+\begin{gather*}
+  \PROC \ ISPRIME(\VALUE \ n, \RESULT \ r) \cdot \\
+  [TRUE, (n \in Prime \And r > 0) \Or (n \notin Prime \And r=0)]
+\end{gather*}
+Which means $ ISPRIME(n)>0 
+\footnote{This act as another procedure call sugar $r \Ass ISPRIME(n)$;
+the complete expanded version will be 
+$ISPRIME(n,r);(( r>0 \Implies r \in Prime)
+\Or (\ELSE \Implies r \notin Prime))$. The continueous prove 
+will follow this convension to make life easier.
+} 
+\Implies n \in Prime $.
+
 
 \subsection{Reverse}
 To define a emirp, a mathmatical function to decribe a number's reverse
@@ -68,6 +86,7 @@ Hence, we can justify the spec of
 $\PROC \ reversen(\VALUE \ n: \ints, \RESULT \ r: \ints )$ 
 as 
 \begin{gather*}
+  \PROC \ reversen(\VALUE \ n: \ints, \RESULT \ r: \ints ) \cdot \\
   r:[\True, r = rev(n)]
 \end{gather*}
 
@@ -120,10 +139,142 @@ we have develop a procedure to do the same thing. Hence we have this spec
       \right)
     ]
   }
+  \displaybreak 
+  \\
+  \refstep{\textbf{i-loc}}{
+    r\cdot w:
+    [
+      \True , 
+      \left(
+        \begin{array}{l}
+          (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
+          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+        \end{array}
+      \right)
+    ] 
+  }
+  \\
+  \refstep{\textbf{seq2}}{
+    \nt{r:
+    [
+      \True , 
+      r= rev(n)
+    ];}{(B)}\\
+    &
+    \nt{r\cdot w:
+    [
+      r= rev(n) , 
+      \left(
+        \begin{array}{l}
+          (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
+          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+        \end{array}
+      \right)
+    ]}{(C)}
+  }
+  \\
+  \lrefstep{(B)}{\textbf{ass},need to be justify? }{
+    r := reversen(n)
+  }
+  % 
+  \\ 
+  \lrefstep{(C)}{\textbf{s-pos}, $r= rev(n)$, replace all the rev in the post}{
+    \nt{
+    r\cdot w:
+    [
+      r= rev(n) , 
+      \left(
+        \begin{array}{l}
+          (w= 1\And r\neq n \And n \in Prime \And r\in Prime) \Or \\
+          (w\neq 1\And \neg (r\neq n \And n \in Prime \And r\in Prime))
+        \end{array}
+      \right)
+    ]}{(C')}
+  }
+  \\ 
+  \refstep{\textbf{if}}{
+    \IF ~r \neq n ~ \\
+    &\THEN     
+      \nt{r\cdot w:
+      [
+        r \neq n, 
+        \post{(C')}
+      ]}{(D)}\\
+    &\ELSE 
+      \nt{r\cdot w:
+      [
+        r = n , 
+        \post{(C')}
+      ]}{(E)}
+    \\
+    &\FI \\
+  }
+  \\
+  \lrefstep{(D)}{\textbf{if}}{
+    % TODO: \in Prime \neq isPrimem (n)
+    \IF ~ ISPRIME(n) > 0 ~ \\
+    &\THEN     
+      \nt{r\cdot w:
+      [
+        r \neq n \And n \in Prime, 
+        \post{(C')}
+      ]}{(F)}\\
+    &\ELSE 
+      \nt{r\cdot w:
+      [
+        r \neq n \And n \notin Prime, 
+        \post{(C')}
+      ]}{(G)}
+    \\
+    &\FI \\
+  }
+  \\
+  \lrefstep{(F)}{\textbf{if}}{
+    % TODO: \in Prime \neq isPrimem (n)
+    \IF ~ISPRIME(r) > 0  ~ \\
+    &\THEN     
+      \nt{r\cdot w:
+      [
+        r \neq n \And n \in Prime \And r \in Prime,
+        \post{(C')}
+      ]}{(G)}\\
+    &\ELSE 
+      \nt{r\cdot w:
+      [
+        r \neq n \And n \in Prime \And r \notin Prime, 
+        \post{(C')}
+      ]}{(H)}
+    \\
+    &\FI \\
+  }
+  % TODO: Need to be justify
+  \lrefstep{(E)(G)(H)}{\textbf{ass}, need to be justify}{
+    w \Ass 0
+  }
+  \\
+  % TODO: Need to be justify 
+  \lrefstep{(G)}{\textbf{ass}, need to be justify}{
+    w \Ass 1
+  }
 \end{align*}
+\subsubsection{Justification of}
 
 \subsubsection{Toy Language Code}
-
+\begin{gather*}
+  r \Ass reversen(n)
+  \IF ~r\neq n ~ \\
+  \THEN \\
+  \qquad \IF ~ ISPRIME(n) >0 ~ \\ 
+  \qquad \THEN \\
+  \qquad \qquad \IF ~ ISPRIME(r) > 0~ \\ 
+  \qquad \qquad \THEN \ w\Ass 1\\
+  \qquad \qquad \ELSE \ w\Ass 0\\
+  \qquad \qquad \FI\\
+  \qquad \ELSE \ w\Ass 0 \\
+  \qquad \FI\\
+  \ELSE \ w\Ass 0 \\
+  \FI\\
+\end{gather*}
 
 \subsection{Pre- and Postcondition}
 Our task is find the $n^{th}$ emprip, by the previous definition of $isEmirp(n)$
