@@ -42,39 +42,31 @@ Anqi ZHU(z5141541)
 \maketitle
 \section{Task 1}
 \subsection{Prime }
-A number is a prime is a nautal number greater than 1 that 
-cannot be formed by mutiplying two smaller number\footnote{
-Direct reference from Wikipedia:
+We define a number $n$ to be a prime if it is a natural number greater than 1 and 
+cannot be formed by mutiplying two natural numbers (bigger than 1) smaller than 
+itself\footnote{
+Reference from Wikipedia:
 \url{https://en.wikipedia.org/wiki/Prime_number}}.
-Hence we can have the definition by set theory:
+Hence we can describe the set containing all primes as:
 \begin{gather*}
-  Prime = \{ n | \neg \Exi{x\in (2..n-1)}{x|n} \}
+  Prime = \{ n\in \nat | \neg (\Exi{x\in (1..n-1)}{x|n}) \And n > 1 \}
 \end{gather*} 
-Then we can base on the GMP function that make up the spec of the 
-procedure call of $\PROC \ ISPRIME(\VALUE \ n, \RESULT \ r)$ 
+GMP provides a function called ISPRIME() to check if a certain number $n$ is a 
+prime or not. The procedure of this function can be expressed as:
 \begin{gather*}
-  \PROC \ ISPRIME(\VALUE \ n, \RESULT \ r) \cdot \\
-  [TRUE, (n \in Prime \And r > 0) \Or (n \notin Prime \And r=0)]
+  \PROC \ ISPRIME(\VALUE \ n, \RESULT \ p) \cdot \\
+  n, p: [TRUE, (n_0 \in Prime \And p > 0) \Or (n_0 \notin Prime \And p<=0)]
 \end{gather*}
-Which means $ ISPRIME(n)>0 
-\footnote{This act as another procedure call sugar $r \Ass ISPRIME(n)$;
-the complete expanded version will be 
-$ISPRIME(n,r);(( r>0 \Implies r \in Prime)
-\Or (\ELSE \Implies r \notin Prime))$. The continueous prove 
-will follow this convension to make life easier.
-} 
-\Implies n \in Prime $.
-
+We shall use its procedure call sugar, $\RESULT \ p = ISPRIME(\VALUE \ n)$, to 
+verify primes later in our refinement.
 
 \subsection{Reverse}
-To define a emirp, a mathmatical function to decribe a number's reverse
-would be helpful. 
-By the spec in verifying reversen\footnote{A 
-proof provided by Lecturer in Control of this course on 
+By the spec in verifying a number $v$ which is the reverse of the number $n$
+\footnote{A proof provided by Lecturer in Control of this course on 
 \url{https://www.cse.unsw.edu.au/~cs2111/18s1/lec/reverse.pdf} },
-we have this definition:
+we can have the following mathematical definition:
 \begin{gather*}
-  rev(n) = \sum_{i= 0}^{c(n)}(S_i 10^i)
+  v = rev(n) = \sum_{i= 0}^{c(n)}(S_i 10^i)
 \end{gather*}
 where:
 \begin{gather*}
@@ -82,34 +74,44 @@ where:
   S = [10]^* ,\\
   n \in \nat \And n = \sum_{i=0}^{c(n)}(S_i 10 ^{(c(n)-i)})
 \end{gather*}
-Hence, we can justify the spec of 
-$\PROC \ reversen(\VALUE \ n: \ints, \RESULT \ r: \ints )$ 
-as 
+Then we can simplify the spec of 
+$\PROC \ reversen(\VALUE \ n: \nat, \RESULT \ v: \nat )$ 
+given by the lecturer, as 
 \begin{gather*}
-  \PROC \ reversen(\VALUE \ n: \ints, \RESULT \ r: \ints ) \cdot \\
-  r:[\True, r = rev(n)]
+  \PROC \ reversen(\VALUE \ n: \nat, \RESULT \ v: \nat ) \cdot \\
+  r, v:[\True, v = rev(r_0)]
 \end{gather*}
-
 
 \subsection{Emirp}
-An emirp is a prime number that results iin a different prime when its 
-decimal digits are reverse\footnote{
+An emirp $n$ is a prime number that results in a different prime when its 
+decimal digits are reversed\footnote{
   Another reference from Wikipedia :\url{https://en.wikipedia.org/wiki/Emirp}
-}. Hence a definition of emirp can be construct as follow:
+}. The definition of emirp can be construct in mathematical semantics as follows:
 \begin{gather*}
-  n \in Emirp \iff n \in Prime \And rev(n) \in Prime 
+  n \in Emirp \iff n \in Prime \And rev(n) \in Prime \And n \neq rev(n)
 \end{gather*}
-We also construct another function to help us find the $n^{th}$ emirp, 
-which is as follow:
+Then we can define a function to check if the specified number $n$ is an emirp.
+The function is such as:
 \begin{gather*}
   isEmirp(n)= \begin{cases}
-    0 & \text{if } n \in Prime \And rev(n) \in Prime \\
-    1 & \text{else }
+    1 & \text{if } n \in Prime \And rev(n) \in Prime \And n \neq rev(n)\\
+    0 & \text{else }
   \end{cases}
 \end{gather*}
-\subsubsection{Procedure Call}
-Also for our usage in the procedure call in the main programme, 
-we have develop a procedure to do the same thing. Hence we have this spec
+We use 0 and 1 as our returning value of the function, so that we can find out 
+how many emirps are found in the range of 2 .. $n$ according to the following 
+mathematics semantics:
+\begin{gather*}
+  \textbf{the number of emirps found} = \sum_{i=0}^{n}isEmirp(i)
+\end{gather*}
+where:
+\begin{gather*}
+  n\in \nat_{>1}
+\end{gather*}
+
+\subsubsection{Derivation of ISEMIRP() Procedure Call}
+We want to transfer the isEmirp() function into a procedure so that we can use it in 
+our later refinement. We start with a spec of the procedure.
 \begin{gather*}
   \PROC \ ISEMIRP(\VALUE \ n: \nat, \RESULT \ w)\cdot \\
   \nt{
@@ -118,14 +120,13 @@ we have develop a procedure to do the same thing. Hence we have this spec
     \True, 
     \left(
       \begin{array}{l}
-        (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
-        (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+        (w= 1\And rev(n_0)\neq n_0 \And n_0 \in Prime \And rev(n_0)\in Prime) \Or \\
+        (w= 0\And \neg (rev(n_0)\neq n_0 \And n_0 \in Prime \And rev(n_0)\in Prime))
       \end{array}
     \right)
   ]}{(A)}
 \end{gather*}
 
-\subsubsection{Refinement Calculatiion}
 \begin{align*}
   \lrefstep{(A)}{\textbf{c-frame}}{
     w:
@@ -134,21 +135,20 @@ we have develop a procedure to do the same thing. Hence we have this spec
       \left(
         \begin{array}{l}
           (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
-          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+          (w= 0\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
         \end{array}
       \right)
     ]
   }
-  \displaybreak 
   \\
   \refstep{\textbf{i-loc}}{
-    r\cdot w:
+    \textbf{var}\ r\cdot w:
     [
       \True , 
       \left(
         \begin{array}{l}
           (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
-          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+          (w= 0\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
         \end{array}
       \right)
     ] 
@@ -166,19 +166,20 @@ we have develop a procedure to do the same thing. Hence we have this spec
       r= rev(n) , 
       \left(
         \begin{array}{l}
-          (w= 1\And rev(n)\neq n \And n \in Prime \And rev(n)\in Prime) \Or \\
-          (w\neq 1\And \neg (rev(n)\neq n \And n \in Prime \And rev(n)\in Prime))
+          (w= 1\And rev(n)\neq n \And n \in Prime \And \\
+          rev(n)\in Prime)\Or (w= 0\And \neg (rev(n)\neq n\\
+          \And n \in Prime \And rev(n)\in Prime))
         \end{array}
       \right)
     ]}{(C)}
   }
   \\
-  \lrefstep{(B)}{\textbf{ass},need to be justify? }{
-    r := reversen(n)
+  \lrefstep{(B)}{\textbf{proc}}{
+    reversen(n, r);
   }
   % 
   \\ 
-  \lrefstep{(C)}{\textbf{s-pos}, $r= rev(n)$, replace all the rev in the post}{
+  \lrefstep{(C)}{\textbf{s-pos}, justified below in 1.3.2}{
     \nt{
     r\cdot w:
     [
@@ -186,24 +187,25 @@ we have develop a procedure to do the same thing. Hence we have this spec
       \left(
         \begin{array}{l}
           (w= 1\And r\neq n \And n \in Prime \And r\in Prime) \Or \\
-          (w\neq 1\And \neg (r\neq n \And n \in Prime \And r\in Prime))
+          (w= 0\And \neg (r\neq n \And n \in Prime \And r\in Prime))
         \end{array}
       \right)
     ]}{(C')}
   }
+  %
   \\ 
-  \refstep{\textbf{if}}{
+  \lrefstep{(C')}{\textbf{if}}{
     \IF ~r \neq n ~ \\
-    &\THEN     
+    &\THEN\      
       \nt{r\cdot w:
       [
-        r \neq n, 
+        r \neq n \And \pre{(C')}, 
         \post{(C')}
       ]}{(D)}\\
-    &\ELSE 
+    &\ELSE\  
       \nt{r\cdot w:
       [
-        r = n , 
+        r = n \And \pre{(C')}, 
         \post{(C')}
       ]}{(E)}
     \\
@@ -213,16 +215,16 @@ we have develop a procedure to do the same thing. Hence we have this spec
   \lrefstep{(D)}{\textbf{if}}{
     % TODO: \in Prime \neq isPrimem (n)
     \IF ~ ISPRIME(n) > 0 ~ \\
-    &\THEN     
+    &\THEN\     
       \nt{r\cdot w:
       [
-        r \neq n \And n \in Prime, 
+        \pre{(D)} \And n \in Prime, 
         \post{(C')}
       ]}{(F)}\\
-    &\ELSE 
+    &\ELSE\  
       \nt{r\cdot w:
       [
-        r \neq n \And n \notin Prime, 
+        \pre{(D)} \And n \notin Prime, 
         \post{(C')}
       ]}{(G)}
     \\
@@ -235,55 +237,60 @@ we have develop a procedure to do the same thing. Hence we have this spec
     &\THEN     
       \nt{r\cdot w:
       [
-        r \neq n \And n \in Prime \And r \in Prime,
+        \pre{(F)} \And r \in Prime,
         \post{(C')}
-      ]}{(G)}\\
+      ]}{(H)}\\
     &\ELSE 
       \nt{r\cdot w:
       [
-        r \neq n \And n \in Prime \And r \notin Prime, 
+        \pre{(F)} \And r \notin Prime, 
         \post{(C')}
-      ]}{(H)}
+      ]}{(I)}
     \\
     &\FI \\
   }
   % TODO: Need to be justify
-  \lrefstep{(E)(G)(H)}{\textbf{ass}, need to be justify}{
+  \lrefstep{(E)(G)(I)}{\textbf{ass}, justfied below in 1.3.3}{
     w \Ass 0
   }
   \\
   % TODO: Need to be justify 
-  \lrefstep{(G)}{\textbf{ass}, need to be justify}{
+  \lrefstep{(H)}{\textbf{ass}, justified below in 1.3.4}{
     w \Ass 1
   }
 \end{align*}
-\subsubsection{Justification of}
-
-\subsubsection{Toy Language Code}
+We gather the code for the procedure body of ISEMIRP:
 \begin{gather*}
-  r \Ass reversen(n)
-  \IF ~r\neq n ~ \\
-  \THEN \\
-  \qquad \IF ~ ISPRIME(n) >0 ~ \\ 
-  \qquad \THEN \\
-  \qquad \qquad \IF ~ ISPRIME(r) > 0~ \\ 
-  \qquad \qquad \THEN \ w\Ass 1\\
-  \qquad \qquad \ELSE \ w\Ass 0\\
-  \qquad \qquad \FI\\
-  \qquad \ELSE \ w\Ass 0 \\
-  \qquad \FI\\
-  \ELSE \ w\Ass 0 \\
-  \FI\\
+  \textbf{var}\ r;\\
+  reversen(n, r);\\
+  \IF~ r\neq n\ \THEN~ \\
+  \qquad \IF~ ISPRIME(n)>0\ \THEN~ \\
+  \qquad\qquad \IF~ ISPRIME(r)>0\\
+  \qquad\qquad\THEN~ w:=1;\\
+  \qquad\qquad \ELSE~ w:=0; \\
+  \qquad\qquad \FI~\\
+  \qquad \ELSE~ w:=0;\\
+  \qquad \FI~\\
+  \ELSE~ w:=0;\\
+  \FI~
 \end{gather*}
 
-\subsection{Pre- and Postcondition}
-Our task is find the $n^{th}$ emprip, by the previous definition of $isEmirp(n)$
-we can construct the pre- and postcondition in this way:
+
+\subsubsection{Proof of $\pre{(C)\subst{r_0}r\subst{w_0}w}\And \post{(C')}\Implies \post{(C)}$}
+\subsubsection{Proof of $(E)(G)(I)\sqsubseteq w \Ass 0$}
+\subsubsection{Proof of $(H)\sqsubseteq w \Ass 1$}
+
+
+\subsection{Specification of the Main Procedure}
+The job of our main procedure, $\PROC \ EMIRP(\VALUE \ n: \nat, \RESULT \ r)$, 
+is to find and return the $n^{th}$ emirp, where $n$ is a given positive parameter. 
+Using the function $isEmirp()$ which is defined and proved above, we can specify 
+our main procedure as:
 \begin{gather*}
-  \PROC \ EMIRP(\VALUE \ n: \nat, \RESULT \ r) \\
-  \nt{n: \nat ,  \RESULT \ r: \nat 
+  \PROC \ EMIRP(\VALUE \ n: \nat, \RESULT \ r)\cdot \\
+  \nt{n, r: 
   [
-    \True ,  
+    n>0 ,  
     \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
   ]}{(1)}
 \end{gather*}  
