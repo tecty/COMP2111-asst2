@@ -142,7 +142,7 @@ our later refinement. We start with a spec of the procedure.
   }
   \\
   \refstep{\textbf{i-loc}}{
-    \textbf{var}\ r\cdot w:
+    \textbf{var}\ r\cdot r,w:
     [
       \True , 
       \left(
@@ -291,117 +291,107 @@ our main procedure as:
   \nt{n, r: 
   [
     n>0 ,  
-    \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+    \sum_{i=2}^{r}isEmirp(i)= n_0 \And r \in Emirp
   ]}{(1)}
 \end{gather*}  
 
 \section{Task 2}
 \begin{align*}
   \lrefstep{(1)}{\textbf{c-frame}}{
-    r
+    r:
     [
-      \True ,  
-      \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+      n>0 ,  
+      \sum_{i=2}^{r}isEmirp(i)= n \And r \in Emirp
     ]
   }
   \\
   \refstep{\textbf{i-loc}}{
-    count \cdot r
+    \textbf{var}\ count \cdot count, r:
     [
-      \True ,  
-      \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+      n>0 ,  
+      \sum_{i=2}^{r}isEmirp(i)= n \And r \in Emirp
     ]
   }
   \\
-  \refstep{\textbf{i-loc}}{
+  \refstep{\textbf{seq}}{
     \nt{
-      count , r
+      count, r:
       [
-        \True ,  
+        n>0 ,  
         Inv
       ]
     }{(2)};\\
     &\nt{
-      count , r
+      count , r:
       [
         Inv,
-        \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp
+        \sum_{i=2}^{r}isEmirp(i)= n \And r \in Emirp
       ]
     }{(3)}
   }
 \end{align*}
-Where the loop invariant is defined by:
+where the loop invariant is defined by:
 % TODO: Modify Inv 
 \begin{gather*}
   Inv = 
   \left( \begin{array}{l}
-    count = \sum_{i=0}^{count}isEmirp(i) \And count \leq n
+    count = \sum_{i=2}^{r}isEmirp(i) \And n > 0\And 0 \leq count \leq n\And r \geq count
   \end{array}\right)
 \end{gather*}
 \begin{align*}
-  \lrefstep{(2)}{Routine work, set up the variable of loop}{
-    r \Ass 1; count \Ass 0;
+  \lrefstep{(2)}{Routine work: initialize the variables in the loop}{
+    r \Ass 2; count \Ass 0;
   }
   \\
   % TODO: Check whether it's correct s-post 
-  \lrefstep{(3)}{\textbf{s-post}}{
-    count , r
+  \lrefstep{(3)}{\textbf{s-post}, justified below}{
+    count , r:
     [
       Inv,
-      % \sum_{i=0}^{r}isEmirp(i)= n \And r \in Emirp \And count = n
-      Inv \And count = n
+      Inv \And (count = n \And r \in Prime)
     ]
   }
   \\
   \refstep {\textbf{while}}{
-    \WHILE ~count \neq n ~ \DO \\ 
+    \WHILE ~count \neq n \Or r \notin Prime\ ~\DO \\ 
     & \qquad 
     \nt{
-      count , r
+      count , r:
       [
-        Inv \And count \neq n ,
+        Inv \And (count \neq n \Or r \notin Prime),
         Inv 
       ]
-    }{4}
+    }{(4)}
     \\
     &\OD
   }
   \\
-  \lrefstep{(4)}{\textbf{seq2}}{
+  \lrefstep{(4)}{\textbf{f-ass}, justified below}{
     \nt{
-      r
+      count, r:
       [
-        Inv \And count \neq n ,
-        Inv \subst{r+1}{r}
-      ];
+        Inv \And (count \neq n \Or r \notin Prime),
+        Inv\subst{r+1}{r}
+      ]
     }{(5)}
     \\
-    &\nt{
-      count, r
-      [
-        Inv \subst{r+1}{r},
-        Inv  
-      ]
-    }{(6)}
+    & r:=r+1;
   }
   \\
-  % TODO : whether it need to justify
-  \lrefstep{(5)}{\textbf{ass, need to justify?}}{
-    r \Ass r+1;
-  }
   % TODO: Need to justify
   \\
-  \lrefstep{(6)}{\textbf{ass, need to justify?}}{
+  \lrefstep{(5)}{\textbf{c-frame, ass}, justified below}{
     count \Ass count + ISEMIRP(r);
   }
 \end{align*}
-\subsubsection{Toy Language Programme}
-We collect all out toy language code, we have 
+We gather the code for the procedure body of EMIRP: 
 \begin{gather*}
-  r \Ass 1; count \Ass 0;\\
-  \WHILE ~count \neq n ~ \DO \\
+  \textbf{var}\ count;\\
+  r \Ass 2; \\
+  count \Ass 0;\\
+  \WHILE ~count \neq n \Or r \notin Prime ~ \DO \\
   \qquad r \Ass r+1;\\
-  \qquad count \Ass count + ISEMIRP(r);
+  \qquad count \Ass count + ISEMIRP(r);\\
   \OD 
 \end{gather*}
 
