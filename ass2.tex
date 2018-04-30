@@ -55,7 +55,7 @@ GMP provides a function called ISPRIME() to check if a certain number $n$ is a
 prime or not. The procedure of this function can be expressed as:
 \begin{gather*}
   \PROC \ ISPRIME(\VALUE \ n, \RESULT \ p) \cdot \\
-  n, p: [TRUE, (n_0 \in Prime \And p > 0) \Or (n_0 \notin Prime \And p<=0)]
+  n, p: [TRUE, (n_0 \in Prime \And p > 0) \Or (n_0 \notin Prime \And p \leq 0)]
 \end{gather*}
 We shall use its procedure call sugar, $\RESULT \ p = ISPRIME(\VALUE \ n)$, to 
 verify primes later in our refinement.
@@ -392,7 +392,7 @@ our main procedure as:
     }{(3)}
   }
 \end{align*}
-where the loop invariant is defined by:
+Where the loop invariant is defined by:
 % TODO: Modify Inv 
 \begin{gather*}
   Inv = 
@@ -414,8 +414,9 @@ where the loop invariant is defined by:
     ]
   }
   \\
-  \refstep {\textbf{while}}{
-    \WHILE ~count \neq n \Or r \notin Emirp\ ~\DO \\ 
+  \refstep {\textbf{while}, a procedure call sugar,
+    similar proof in 1.1.1 }{
+    \WHILE ~count \neq n \Or ISEMIRP(r)\neq 1 ~\DO \\ 
     & \qquad 
     \nt{
       count , r:
@@ -428,22 +429,21 @@ where the loop invariant is defined by:
     &\OD
   }
   \\
-  \lrefstep{(4)}{\textbf{f-ass}, justified below}{
+  \lrefstep{(4)}{\textbf{f-ass}}{
     \nt{
       count, r:
       [
         Inv \And (count \neq n \Or r \notin Emirp),
-        Inv\subst{r+1}{r}
-      ]
+        Inv\subst{count + ISEMIRP(r)}{count}
+      ] ;
     }{(5)}
     \\
-    & r:=r+1;
+    &count \Ass count + ISEMIRP(r);
   }
-  \\
   % TODO: Need to justify
   \\
   \lrefstep{(5)}{\textbf{c-frame, ass}, justified below}{
-    count \Ass count + ISEMIRP(r);
+    r \Ass r+1;
   }
 \end{align*}
 We gather the code for the procedure body of EMIRP: 
@@ -451,14 +451,51 @@ We gather the code for the procedure body of EMIRP:
   \textbf{var}\ count;\\
   r \Ass 2; \\
   count \Ass 0;\\
-  \WHILE ~count \neq n \Or r \notin Emirp ~ \DO \\
+  \WHILE ~count \neq n \Or  ISEMIRP(r) \neq 1~ \DO \\
   \qquad r \Ass r+1;\\
   \qquad count \Ass count + ISEMIRP(r);\\
   \OD 
 \end{gather*}
 
+\section{Task 3} 
+\subsection{Proof of 
+$\pre(3)\subst{count_0}{count}\subst{r_0}{r} \And (Inv \And (count = n \And r \in Emirp)) 
+\Implies \post{(3)}$}
+\begin{align*}
+  & \pre(3) \And Inv \And (count = n \And r \in Emirp)\\
+  \justification{Expand $\pre(3)$ }
+  & Inv\subst{count_0}{count}\subst{r_0}{r}
+    \And (Inv \And (count = n \And r \in Emirp))
+  \\
+  \justification{Substitute $Inv$ and 
+    $Inv\subst{count_0}{count}\subst{r_0}{r}$ }
+  & \left( \begin{array}{l}
+    (count_0 = \sum_{i=2}^{r_0}isEmirp(i) 
+    \And n > 0\And 0 \leq count_0 \leq n\And r_0 \geq count_0) \And\\
+    (count = \sum_{i=2}^{r}isEmirp(i) \And 
+    n > 0\And 0 \leq count \leq n\And r \geq count \And\\
+    (count = n \And r \in Emirp))
+  \end{array}\right) 
+  \\
+  \justification[\Implies]{Simplify and remove $count$.}
+  & \left( \begin{array}{l}
+    (count_0 = \sum_{i=2}^{r_0}isEmirp(i) 
+    \And n > 0\And 0 \leq count_0 \leq n\And r_0 \geq count_0) \And\\
+    (n= \sum_{i=2}^{r}isEmirp(i) \And r \geq n \And  r \in Emirp)
+  \end{array}\right)
+  \\
+  \justification[\Implies]{Directly imply from second line.}
+  & \sum_{i=2}^{r}isEmirp(i)= n \And r \in Emirp \\ 
+  \justification{Definition of $\post{(3)} $}
+  & \post{(3)}  
+\end{align*}
 
-\subsection{Task 3}
-\subsection{Task 4}
+\subsection{Proof of $(5) \isrefinedby r\Ass r+1  $}
+We need to prove the validity of:
+\begin{gather*}
+  ss
+\end{gather*}
+
+\section{Task 4}
 
 \end{document}
