@@ -178,8 +178,9 @@ our later refinement. We start with a spec of the procedure.
     reversen(n, r);
   }
   % 
+  %  a c-frame is require
   \\ 
-  \lrefstep{(C)}{\textbf{s-pos}, justified below in 1.3.2}{
+  \lrefstep{(C)}{\textbf{s-post}, justified below in 1.3.2}{
     \nt{
     r\cdot w:
     [
@@ -340,7 +341,7 @@ where the loop invariant is defined by:
 \end{gather*}
 \begin{align*}
   \lrefstep{(2)}{Routine work: initialize the variables in the loop}{
-    r \Ass 2; count \Ass 0;
+    r \Ass 1; count \Ass 0;
   }
   \\
   % TODO: Check whether it's correct s-post 
@@ -348,17 +349,17 @@ where the loop invariant is defined by:
     count , r:
     [
       Inv,
-      Inv \And (count = n \And r \in Prime)
+      Inv \And (count = n \And r \in Emirp)
     ]
   }
   \\
   \refstep {\textbf{while}}{
-    \WHILE ~count \neq n \Or r \notin Prime\ ~\DO \\ 
+    \WHILE ~count \neq n \Or r \notin Emirp\ ~\DO \\ 
     & \qquad 
     \nt{
       count , r:
       [
-        Inv \And (count \neq n \Or r \notin Prime),
+        Inv \And (count \neq n \Or r \notin Emirp),
         Inv 
       ]
     }{(4)}
@@ -370,7 +371,7 @@ where the loop invariant is defined by:
     \nt{
       count, r:
       [
-        Inv \And (count \neq n \Or r \notin Prime),
+        Inv \And (count \neq n \Or r \notin Emirp),
         Inv\subst{r+1}{r}
       ]
     }{(5)}
@@ -389,7 +390,7 @@ We gather the code for the procedure body of EMIRP:
   \textbf{var}\ count;\\
   r \Ass 2; \\
   count \Ass 0;\\
-  \WHILE ~count \neq n \Or r \notin Prime ~ \DO \\
+  \WHILE ~count \neq n \Or r \notin Emirp ~ \DO \\
   \qquad r \Ass r+1;\\
   \qquad count \Ass count + ISEMIRP(r);\\
   \OD 
