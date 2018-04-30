@@ -161,7 +161,7 @@ our later refinement. We start with a spec of the procedure.
       r= rev(n)
     ];}{(B)}\\
     &
-    \nt{r\cdot w:
+    \nt{r, w:
     [
       r= rev(n) , 
       \left(
@@ -180,9 +180,24 @@ our later refinement. We start with a spec of the procedure.
   % 
   %  a c-frame is require
   \\ 
-  \lrefstep{(C)}{\textbf{s-post}, justified below in 1.3.2}{
+  \lrefstep{(C)}{\textbf{c-frame}}{
+    \nt {w:
+    [
+      r= rev(n) , 
+      \left(
+        \begin{array}{l}
+          (w= 1\And rev(n)\neq n \And n \in Prime \And \\
+          rev(n)\in Prime)\Or (w= 0\And \neg (rev(n)\neq n\\
+          \And n \in Prime \And rev(n)\in Prime))
+        \end{array}
+      \right)
+    ]}{(C*)}
+  }
+  % 
+  \\ 
+  \refstep{\textbf{s-post}, justified below in 1.3.2}{
     \nt{
-    r\cdot w:
+    w:
     [
       r= rev(n) , 
       \left(
@@ -198,13 +213,13 @@ our later refinement. We start with a spec of the procedure.
   \lrefstep{(C')}{\textbf{if}}{
     \IF ~r \neq n ~ \\
     &\THEN\      
-      \nt{r\cdot w:
+      \nt{ w:
       [
         r \neq n \And \pre{(C')}, 
         \post{(C')}
       ]}{(D)}\\
     &\ELSE\  
-      \nt{r\cdot w:
+      \nt{ w:
       [
         r = n \And \pre{(C')}, 
         \post{(C')}
@@ -217,13 +232,13 @@ our later refinement. We start with a spec of the procedure.
     % TODO: \in Prime \neq isPrimem (n)
     \IF ~ ISPRIME(n) > 0 ~ \\
     &\THEN\     
-      \nt{r\cdot w:
+      \nt{ w:
       [
         \pre{(D)} \And n \in Prime, 
         \post{(C')}
       ]}{(F)}\\
     &\ELSE\  
-      \nt{r\cdot w:
+      \nt{ w:
       [
         \pre{(D)} \And n \notin Prime, 
         \post{(C')}
@@ -236,13 +251,13 @@ our later refinement. We start with a spec of the procedure.
     % TODO: \in Prime \neq isPrimem (n)
     \IF ~ISPRIME(r) > 0  ~ \\
     &\THEN     
-      \nt{r\cdot w:
+      \nt{ w:
       [
         \pre{(F)} \And r \in Prime,
         \post{(C')}
       ]}{(H)}\\
     &\ELSE 
-      \nt{r\cdot w:
+      \nt{ w:
       [
         \pre{(F)} \And r \notin Prime, 
         \post{(C')}
@@ -277,10 +292,56 @@ We gather the code for the procedure body of ISEMIRP:
 \end{gather*}
 
 
-\subsubsection{Proof of $\pre{(C)\subst{r_0}r\subst{w_0}w}\And \post{(C')}\Implies \post{(C)}$}
-\subsubsection{Proof of $(E)(G)(I)\sqsubseteq w \Ass 0$}
-\subsubsection{Proof of $(H)\sqsubseteq w \Ass 1$}
+\subsubsection{Proof of $r= rev(n)\subst{w_0}{w}\And \post{(C*)}$}
+\begin{align*}
+  &r= rev(n)\subst{w_0}{w}\And \post{(C')}\\
+  \justification{Subutitue and expand $\post{(C')}$}
+  &
+  r= rev(n) \And 
+  \left(
+    \begin{array}{l}
+      (w= 1\And rev(n)\neq n \And n \in Prime \And \\
+      rev(n)\in Prime)\Or (w= 0\And \neg (rev(n)\neq n\\
+      \And n \in Prime \And rev(n)\in Prime))
+    \end{array}
+  \right)\\
+  \justification{Substitute $r = rev(n)$}
+  &
+  \left(
+    \begin{array}{l}
+      (w= 1\And r\neq n \And n \in Prime \And r\in Prime)\Or \\ 
+      (w= 0\And \neg (r\neq n \And n \in Prime \And r\in Prime))
+    \end{array}
+  \right)\\
+  \justification{definition of $\post{(C)}$}
+  &\post{(C)} 
+\end{align*}
 
+\subsubsection{Proof of $(E)(G)(I)\sqsubseteq w \Ass 0$}
+Before prooving this assertion, we oberser that in the $\post{(C')}$, we have 
+\begin{align*}
+  &\neg (r\neq n \And n \in Prime \And r\in Prime) \\
+  \Equiv& r = n \Or n \notin Prime \Or r\notin Prime\\
+  \Implies & w= 0
+\end{align*}
+Then this assertion is valid:
+\begin{gather*}
+  r = n \Or n \notin Prime \Or r\notin Prime \Implies \post{(C')}\subst{0}{w}
+\end{gather*}
+By observerve the $ \pre{(E)}$ ,$ \pre{(G)}$ ,$ \pre{(I)}$, we have:
+\begin{gather*}
+  \pre{(E)} \Implies r = n          \Implies \post{(C')}\subst{0}{w}\\
+  \pre{(G)} \Implies n \notin Prime \Implies \post{(C')}\subst{0}{w}\\
+  \pre{(I)} \Implies r \notin Prime \Implies \post{(C')}\subst{0}{w}
+\end{gather*} 
+Which proof the validity.
+
+\subsubsection{Proof of $(H)\sqsubseteq w \Ass 1$}
+Similar to 1.3.3 we have:
+\begin{gather*}
+  \pre{(H)}\Equiv (r\neq n \And n \in Prime \And r\in Prime) 
+  \Implies \post{(C')}\subst{1}{w}
+\end{gather*}
 
 \subsection{Specification of the Main Procedure}
 The job of our main procedure, $\PROC \ EMIRP(\VALUE \ n: \nat, \RESULT \ r)$, 
