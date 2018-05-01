@@ -295,7 +295,8 @@ our later refinement. We start with a spec of the procedure.
         \post{(C')}
       ]}{(I)}
     \\
-    &\FI \\
+    &\FI 
+    \displaybreak\\
   }
   % TODO: Need to be justify
   \lrefstep{(E)(G)(I)}{\textbf{ass}, justfied below in 1.3.3}{
@@ -594,6 +595,17 @@ $\pre(3)\subst{count_0}{count}\subst{r_0}{r} \And (Inv \And (count = n \And r \i
   & \post{(4)}
 \end{align*}
 \section{Task 3} 
-\section{Task 4}
+\lstinputlisting{emirp.c}
 
+\section{Task 4}
+We have implement procedure call $ISEMIRP$ and $EMIRP$ to our C functions 
+and for the $ISPRIME$ function we are useing a libarary function in GMP
+(\url{mpz_probab_prime_p}). We are pretend the libarary function will always
+give back a correct check for whether the number is prime or not, which 
+we have test it for correctly finding 1000 emirp by our config.\\
+We have setted the $r$ to have an initial value of 1, then it would be start
+searching $Emirp$ from 2 because it is $ r \Ass r +1 $ before 
+$ count \Ass count +1 $. Also we found it difficult to prove when the 
+loop is break then it will implies $r \in Prime$, so we have add a check 
+in the while loop. Other place just a exact implement of C. 
 \end{document}

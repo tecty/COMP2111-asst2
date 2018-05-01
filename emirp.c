@@ -7,7 +7,6 @@ int isEmirp(mpz_t n);
 int main(int argc, char const *argv[]) {
   unsigned long long n;
 
-
   if (scanf("%llu",&n) == 1){
     // call the procedure to find nth emirp
     emirp(n);
@@ -21,20 +20,16 @@ void emirp( unsigned long long n ) {
   // initial the r
   mpz_t r;
   mpz_init(r);
+  // r = 1
   mpz_set_ui(r,1);
 
-
-
-  // initial the count
+  // count = 0
   unsigned long long count =0 ;
-  while (count < n ) {
-    // r ++;
+  while (count != n || isEmirp(r)!= 1) {
+    // r = r+1;
     mpz_add_ui(r,r,1);
     // count = count + ISEMIRP(r)
     count += isEmirp(r);
-
-    // gmp_printf("%Zd ",r );
-    // printf("with is Emirp %d\n", isEmirp(r) );
   }
   gmp_printf("%Zd\n",r );
 
@@ -47,22 +42,30 @@ int isEmirp(mpz_t n){
   // r = reversen(n)
   mpz_init(r);
   reversen(n,r);
-  // gmp_printf(" the reverse value of %Zd is %Zd \n",n,r );
+
+
   if(mpz_cmp(n,r) !=0  ){
+    // {n != r}
     if (mpz_probab_prime_p(n,50) >0) {
-      /* code */
+      // {n \in Prime}
       if(mpz_probab_prime_p(r,50) >0){
+        // {r \in Prime}
+
+        // {n != r && n \in Prime && r \in Prime} \Implies {w = 1}
         w =1;
       }
       else{
+        // {r \notin Prime}
         w =0;
       }
     }
     else{
+      // {n \notin Prime}
       w = 0;
     }
   }
   else{
+    // {n = r}
     w= 0;
   }
   return w;
