@@ -598,14 +598,14 @@ $\pre(3)\subst{count_0}{count}\subst{r_0}{r} \And (Inv \And (count = n \And r \i
 \lstinputlisting{emirp.c}
 
 \section{Task 4}
-We have implement procedure call $ISEMIRP$ and $EMIRP$ to our C functions 
-and for the $ISPRIME$ function we are useing a libarary function in GMP
-(\url{mpz_probab_prime_p}). We are pretend the libarary function will always
-give back a correct check for whether the number is prime or not, which 
-we have test it for correctly finding 1000 emirp by our config.\\
-We have setted the $r$ to have an initial value of 1, then it would be start
-searching $Emirp$ from 2 because it is $ r \Ass r +1 $ before 
+We have implemented the procedure calls $ISEMIRP$ and $EMIRP$ to our C functions.
+For the $ISPRIME$ function we used a libarary function in GMP
+(\url{mpz_probab_prime_p}). We pretended that the libarary function will always
+give back an accurate check for whether the number is a prime or not (We tested that 
+the function could be accurate enough until at least finding the 1000th emirp.)\\
+We set $r$ to have an initial value of 1, then it would be start
+searching $Emirp$ from 2 because $ r \Ass r +1 $ is before 
 $ count \Ass count +1 $. Also we found it difficult to prove when the 
 loop is break then it will implies $r \in Prime$, so we have add a check 
-in the while loop. Other place just a exact implement of C. 
+in the while loop. 
 \end{document}
