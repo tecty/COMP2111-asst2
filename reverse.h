@@ -10,13 +10,9 @@
    where c(n) = \floor{\log_{10}n} % that's why n=0 is excluded
 */
 
-#ifndef USEGMP
-void reversen(unsigned long n, unsigned long *r);
-#else
+
 #include <gmp.h>
 void reversen(mpz_t n, mpz_t r);
-#endif
 
 /* ugly global vars for doing the reversing, big enough to hold the largest known emirps */
 char _reversen_inbuf[11111], _reversen_outbuf[11111];
-

@@ -1,0 +1,26 @@
+Therefore, using its procedure call sugar, $                                                                                                                                                                                                                                                                                  $,
+we can prove the following refinement:
+\begin{align*}
+  & \PROC \ ISPRIME(\VALUE \ n, \RESULT \ r) \cdot \\
+  & n, r: [TRUE, (n \in Prime \And r > 0) \Or (n \notin Prime \And r<=0)]\\
+  \refstep{}
+  {\IF~n \in Prime\\
+  &\THEN~\ r:[r = ISPRIME(\VALUE \n)\And r>0, n\in Prime]\\
+  &\ELSE~\nt{p:[l\neq r+1\And\pre(2),\post(2)]}{(4)}\\
+  &\FI}\\
+\end{align*}
+Then we can base on the GMP function that make up the spec of the 
+procedure call of $\PROC \ ISPRIME(\VALUE \ n, \RESULT \ r)$ 
+\begin{gather*}
+  \PROC \ ISPRIME(\VALUE \ n, \RESULT \ r) \cdot \\
+  [TRUE, (n \in Prime \And r > 0) \Or (n \notin Prime \And r=0)]
+\end{gather*}
+Which means $ ISPRIME(n)>0 
+\footnote{This act as another procedure call sugar $r \Ass ISPRIME(n)$;
+the complete expanded version will be 
+$ISPRIME(n,r);(( r>0 \Implies r \in Prime)
+\Or (\ELSE \Implies r \notin Prime))$. The continueous prove 
+will follow this convension to make life easier.
+} 
+\Implies n \in Prime $.
+
